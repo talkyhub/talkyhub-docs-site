@@ -1,0 +1,344 @@
+/**
+ * TalkyHub Docs theme — palette/fonts mirror the landing (talkyhub.ru):
+ * violet accent (#7e14ff) on a light lavender ground. Light mode only
+ * (dark switch disabled in config).
+ */
+@import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700;800&family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  /* brand — var names kept (*-lime) for back-compat with src/theme.ts; values
+     are the TalkyHub violet palette from the landing. */
+  --vh-bg: #f5f4fb;
+  --vh-surface: #ffffff;
+  --vh-ink: #14101d;
+  --vh-lime: #7e14ff;        /* accent (violet) */
+  --vh-lime-deep: #6410cf;   /* accent, deeper */
+  --vh-violet-tint: #efe9ff;
+  --vh-on-accent: #ffffff;
+  --vh-card-border: #e7e3f2;
+  --vh-hairline: #eeecf7;
+  --vh-text-muted: #58516a;
+  --vh-text-subtle: #897fa0;
+
+  /* Infima primary = violet (links/active/buttons). */
+  --ifm-color-primary: #7e14ff;
+  --ifm-color-primary-dark: #6410cf;
+  --ifm-color-primary-darker: #5a0eb8;
+  --ifm-color-primary-darkest: #4a0c98;
+  --ifm-color-primary-light: #9a5cff;
+  --ifm-color-primary-lighter: #a877ff;
+  --ifm-color-primary-lightest: #c4a3ff;
+
+  --ifm-background-color: var(--vh-surface);
+  --ifm-background-surface-color: var(--vh-surface);
+  --ifm-navbar-background-color: rgba(245, 244, 251, 0.86);
+  --ifm-footer-background-color: var(--vh-ink);
+
+  --ifm-font-family-base: 'Golos Text', system-ui, sans-serif;
+  /* Headings use the plain body family, not the Unbounded logotype display
+     font (that stays reserved for the brand wordmark/logo). */
+  --ifm-heading-font-family: 'Golos Text', system-ui, sans-serif;
+  --ifm-font-family-monospace: 'JetBrains Mono', monospace;
+  --ifm-code-font-size: 92%;
+
+  --ifm-menu-color-active: var(--ifm-color-primary);
+  --docusaurus-highlighted-code-line-bg: rgba(126, 20, 255, 0.1);
+}
+
+/* ---- navbar ---- */
+.navbar {
+  backdrop-filter: saturate(160%) blur(12px);
+  border-bottom: 1px solid var(--vh-card-border);
+}
+/* centralize navbar content to the same max width as talkyhub.ru */
+.navbar__inner {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+.navbar__logo img {
+  border-radius: 8px;
+}
+.navbar__title {
+  font-family: var(--ifm-heading-font-family);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* ---- active sidebar item: violet fill, light text ---- */
+.menu__link--active:not(.menu__link--sublist) {
+  background: var(--vh-lime);
+  color: var(--vh-on-accent);
+}
+.menu__link--active:not(.menu__link--sublist):hover {
+  background: var(--vh-lime-deep);
+  color: var(--vh-on-accent);
+}
+
+/* ---- content links: violet, underlined ---- */
+.markdown a {
+  text-decoration: underline;
+  text-decoration-color: var(--vh-lime);
+  text-underline-offset: 2px;
+  font-weight: 600;
+}
+.markdown a:hover {
+  text-decoration-color: var(--vh-lime-deep);
+}
+
+/* ---- inline code & code blocks ---- */
+.markdown code {
+  background: var(--vh-violet-tint);
+  border: 1px solid rgba(126, 20, 255, 0.18);
+  border-radius: 6px;
+  padding: 0.08rem 0.32rem;
+}
+.theme-code-block,
+div[class*='codeBlockContainer_'] {
+  border: 1px solid var(--vh-card-border);
+  border-radius: 12px;
+}
+.theme-code-block code,
+div[class*='codeBlockContainer_'] code {
+  background: transparent !important;
+}
+
+/* ---- buttons ---- */
+.button--primary {
+  --ifm-button-background-color: var(--vh-lime);
+  --ifm-button-border-color: var(--vh-lime);
+  --ifm-button-color: var(--vh-on-accent);
+}
+.button--primary:hover {
+  background: var(--vh-lime-deep);
+  border-color: var(--vh-lime-deep);
+  color: var(--vh-on-accent);
+}
+
+::selection {
+  background: var(--vh-lime);
+  color: var(--vh-on-accent);
+}
+
+/* ---- footer (mirrors talkyhub.ru) ---- */
+.vh-footer {
+  background: var(--vh-ink);
+  color: #a79fbb;
+}
+.vh-footer__inner {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 64px 32px 36px;
+}
+.vh-foot-grid {
+  display: grid;
+  grid-template-columns: 1.7fr 1fr 1.2fr 1.3fr;
+  gap: 40px;
+  padding-bottom: 44px;
+  border-bottom: 1px solid rgba(245, 244, 251, 0.1);
+}
+.vh-foot-head {
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--vh-bg);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 18px;
+}
+.vh-foot-col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.vh-foot-link {
+  font-size: 14.5px;
+  color: #a79fbb;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+.vh-foot-link:hover {
+  color: var(--vh-bg);
+  text-decoration: none;
+}
+.vh-foot-contact {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  font-size: 14.5px;
+  color: #c3bcd4;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+.vh-foot-contact:hover {
+  color: var(--vh-bg);
+  text-decoration: none;
+}
+.vh-foot-ico {
+  flex: 0 0 auto;
+  display: inline-flex;
+  width: 18px;
+  justify-content: center;
+}
+.vh-foot-social {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  color: #fff;
+  text-decoration: none;
+  transition: filter 0.2s ease;
+}
+.vh-foot-social:hover {
+  filter: brightness(0.92);
+}
+.vh-foot-bottom {
+  padding-top: 26px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 28px;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.vh-foot-legal {
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 12px;
+  line-height: 1.8;
+  color: #736c86;
+  max-width: 760px;
+}
+.vh-foot-legal a {
+  color: inherit;
+}
+.vh-foot-copy {
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 12px;
+  color: #736c86;
+}
+.vh-foot-cookie {
+  margin-top: 22px;
+  font-size: 12.5px;
+  line-height: 1.65;
+  color: #635c76;
+  max-width: 920px;
+}
+@media (max-width: 996px) {
+  .vh-foot-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+}
+@media (max-width: 640px) {
+  .vh-foot-grid {
+    grid-template-columns: 1fr;
+  }
+  .vh-footer__inner {
+    padding: 44px 20px 28px;
+  }
+}
+
+/* ---- doc pagination: brand cards with arrow glyphs ---- */
+.pagination-nav__link.vh-pager {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 1rem 1.15rem;
+  border: 1px solid var(--vh-card-border);
+  border-radius: 18px;
+  background: var(--vh-surface);
+  transition: border-color 180ms ease;
+}
+.pagination-nav__link.vh-pager:hover {
+  border-color: var(--vh-lime);
+}
+.vh-pager--next {
+  flex-direction: row-reverse;
+}
+.vh-pager__icon {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--vh-ink);
+  transition: color 180ms ease;
+}
+.vh-pager:hover .vh-pager__icon {
+  color: var(--vh-lime);
+}
+.vh-pager__text {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.vh-pager--prev .vh-pager__text {
+  text-align: left;
+}
+.vh-pager--next .vh-pager__text {
+  text-align: right;
+}
+.vh-pager__sub {
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--vh-text-subtle);
+}
+.vh-pager__label {
+  font-family: var(--ifm-heading-font-family);
+  font-weight: 700;
+  color: var(--vh-ink);
+  white-space: normal;
+}
+/* drop Infima's default « / » glyphs — we render real arrow icons */
+.vh-pager .pagination-nav__label::before,
+.vh-pager .pagination-nav__label::after {
+  content: none;
+}
+
+/* ---- sticky-footer layout ---- */
+html,
+body,
+#__docusaurus {
+  min-height: 100%;
+}
+body {
+  display: flex;
+  flex-direction: column;
+}
+#__docusaurus {
+  display: flex;
+  flex: 1 0 auto;
+  flex-direction: column;
+}
+.main-wrapper {
+  flex: 1 0 auto;
+}
+
+@media (max-width: 996px) {
+  /* dial the custom navbar padding back toward Docusaurus' mobile default so
+     the brand (logo + wordmark + DOCS tag) and the hamburger toggle don't crowd */
+  .navbar__inner {
+    padding: 0 16px;
+  }
+  /* mobile menu = full-screen, fully opaque sheet (no translucency/backdrop) */
+  .navbar-sidebar {
+    z-index: 1001;
+    width: 100%;
+    height: 100dvh;
+    background: var(--vh-bg);
+  }
+  .navbar-sidebar__backdrop {
+    display: none;
+  }
+  .navbar-sidebar__brand {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--vh-bg);
+  }
+}

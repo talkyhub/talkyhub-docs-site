@@ -1,0 +1,16 @@
+# TalkyHub docs site deployment. The static site is baked into the image (built in CI from this engine +
+# talkyhub-docs content) and served by the container's nginx on :80. The HOST nginx
+# (deploy/nginx/docs.talkyhub.ru.conf) terminates TLS for docs.talkyhub.ru and proxies to
+# 127.0.0.1:${DOCS_PORT}. There is no state and no config — the container is pure static, so no .env is needed.
+#
+# Deploy (see .github/workflows/deploy.yml): the workflow scp's this file to the server, then runs
+# `IMAGE_TAG=<run id> docker compose pull && docker compose up -d`. IMAGE_TAG selects the immutable image tag.
+services:
+  talkyhub-docs-site:
+    image: ghcr.io/talkyhub/talkyhub-docs-site:${IMAGE_TAG:-latest}
+    container_name: talkyhub-docs-site
+    # Bound to localhost: the host nginx is the only ingress. 8083 keeps clear of api (8080), app (8081) and
+    # the landing (8082).
+    ports:
+      - "127.0.0.1:${DOCS_PORT:-8083}:80"
+    restart: unless-stopped

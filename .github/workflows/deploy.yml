@@ -1,0 +1,130 @@
+name: Build & Deploy Docs
+
+# Self-hosted deploy (NOT GitHub Pages): build the static site (pulling content from talkyhub-docs), bake it
+# into an nginx image, push to GHCR, then SSH to the server and `docker compose up -d` — the same host that
+# runs the API/app/landing. The host nginx (deploy/nginx/docs.talkyhub.ru.conf) fronts docs.talkyhub.ru and
+# proxies to the container on 127.0.0.1:8083.
+#
+# Unlike the API's promote-by-SHA flow, docs are content-driven: a content change fires a repository_dispatch
+# from talkyhub-docs but does not change THIS repo's SHA, so the image is built fresh here on every deploy and
+# tagged by a unique run id (plus :latest). Rollback = redeploy an older run-id tag.
+
+on:
+  push:
+    branches: [production]
+  repository_dispatch:
+    types: [docs-update]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-docs-production
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      contents: read
+      packages: write
+    env:
+      SSH_PORT: ${{ vars.SSH_PORT || '22' }}
+      DEPLOY_PATH: ${{ vars.DOCS_DEPLOY_PATH || '/opt/talkyhub-docs-site' }}
+      SSH_HOST: ${{ vars.SSH_HOST }}
+      SSH_USER: ${{ vars.SSH_USER }}
+      IMAGE: ghcr.io/${{ github.repository }}
+      IMAGE_TAG: ${{ github.run_id }}
+    steps:
+      - name: Checkout engine repo
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Clone docs repo (public)
+        run: git clone --depth 1 https://github.com/talkyhub/talkyhub-docs.git external-docs
+
+      - name: Replace docs and i18n folders
+        run: |
+          rm -rf docs
+          test -d external-docs/docs
+          mv external-docs/docs ./docs
+          rm -rf i18n
+          if [ -d external-docs/i18n ]; then
+            mv external-docs/i18n ./i18n
+          fi
+
+      - name: Verify copied docs content
+        run: |
+          test -f docs/index.md || (echo "docs/index.md missing after copy" && exit 1)
+
+      - name: Copy registry links for static endpoint
+        working-directory: external-docs
+        run: |
+          if [ -f registry/links.json ]; then
+            mkdir -p ../static
+            cp registry/links.json ../static/links.json
+          fi
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build site
+        run: npm run build
+        env:
+          DOCSEARCH_APP_ID: ${{ secrets.DOCSEARCH_APP_ID }}
+          DOCSEARCH_API_KEY: ${{ secrets.DOCSEARCH_API_KEY }}
+          DOCSEARCH_INDEX_NAME: ${{ secrets.DOCSEARCH_INDEX_NAME }}
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build & push image (static site baked into nginx)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ${{ env.IMAGE }}:${{ github.run_id }}
+            ${{ env.IMAGE }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Configure SSH
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p "$SSH_PORT" "$SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Copy compose file to the server
+        run: |
+          ssh -i ~/.ssh/deploy_key -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" "mkdir -p '$DEPLOY_PATH'"
+          scp -i ~/.ssh/deploy_key -P "$SSH_PORT" docker-compose.yml "$SSH_USER@$SSH_HOST:$DEPLOY_PATH/docker-compose.yml"
+
+      - name: Pull image & (re)start the stack
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_ACTOR: ${{ github.actor }}
+        run: |
+          printf '%s' "$GHCR_TOKEN" | ssh -i ~/.ssh/deploy_key -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" \
+            "docker login ghcr.io -u '$GH_ACTOR' --password-stdin \
+             && cd '$DEPLOY_PATH' \
+             && IMAGE_TAG='$IMAGE_TAG' docker compose pull \
+             && IMAGE_TAG='$IMAGE_TAG' docker compose up -d \
+             && docker image prune -f \
+             && docker logout ghcr.io"

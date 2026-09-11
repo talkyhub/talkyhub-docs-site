@@ -1,0 +1,14 @@
+# The image only needs build/ (the pre-built site) + deploy/container-nginx.conf. Keep the build context small
+# and never leak node_modules / VCS / the cloned content repo into it.
+node_modules
+.git
+.github
+.docusaurus
+external-docs
+src
+static
+docs
+i18n
+openapi
+scripts
+*.md

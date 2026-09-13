@@ -1,5 +1,5 @@
 /**
- * TalkyHub Docs landing — cream/ink/lime palette to match the landing.
+ * TalkyHub Docs landing — violet/ink palette to match the landing (talkyhub.ru).
  */
 
 .page {
@@ -7,8 +7,8 @@
   overflow: hidden;
   min-height: 100vh;
   background:
-    radial-gradient(820px 360px at 12% 0%, rgba(199, 240, 74, 0.28), transparent 60%),
-    radial-gradient(760px 320px at 88% 6%, rgba(199, 240, 74, 0.14), transparent 56%),
+    radial-gradient(820px 360px at 12% 0%, rgba(126, 20, 255, 0.28), transparent 60%),
+    radial-gradient(760px 320px at 88% 6%, rgba(126, 20, 255, 0.14), transparent 56%),
     linear-gradient(180deg, var(--vh-bg) 0%, var(--vh-surface) 60%, var(--vh-bg) 100%);
 }
 
@@ -209,7 +209,7 @@
   align-items: center;
   border-radius: 999px;
   padding: 0.34rem 0.7rem;
-  background: rgba(199, 240, 74, 0.3);
+  background: rgba(126, 20, 255, 0.3);
   color: var(--vh-ink);
   font-family: var(--ifm-font-family-monospace);
   font-size: 0.72rem;

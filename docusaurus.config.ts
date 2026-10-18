@@ -37,7 +37,19 @@ const config: Config = {
         content: '#7e14ff',
       },
     },
+    // Embedded mode (the TalkyHub app's help panel shows docs pages in an iframe): flag the page before the
+    // first paint so CSS hides the navbar/footer/sidebar with no flash. In an iframe it's always on; `?embed=1`
+    // forces it for previews. Docusaurus manages <html> class, so a data attribute is used instead.
+    {
+      tagName: 'script',
+      attributes: {},
+      innerHTML:
+        "try{if(window.self!==window.top||/[?&]embed=1(&|$)/.test(location.search))document.documentElement.setAttribute('data-th-embed','')}catch(e){document.documentElement.setAttribute('data-th-embed','')}",
+    },
   ],
+
+  // Re-asserts the embed flag after client-side navigations (see src/clientModules/embed.ts).
+  clientModules: ['./src/clientModules/embed.ts'],
 
   i18n: {
     defaultLocale: 'ru',

@@ -34,6 +34,20 @@ npm run build      # прод-сборка (в build/)
 2. `talkyhub-docs-site` (этот репозиторий) — движок и тема Docusaurus + артефакты
    деплоя (`Dockerfile`, `docker-compose.yml`, `deploy/`).
 
+## Связь с приложением (панель «Помощь»)
+
+Приложение app.talkyhub.ru показывает страницы документации в своей панели «Помощь» (iframe) и строит ссылки по
+`/links.json` (копия `talkyhub-docs/registry/links.json`). Для этого:
+
+- **Режим встраивания** — во фрейме (или с `?embed=1`) сайт скрывает шапку, подвал, сайдбар и оглавление:
+  инлайн-скрипт в `headTags` (`docusaurus.config.ts`) ставит `html[data-th-embed]` до отрисовки,
+  `src/clientModules/embed.ts` держит флаг при навигации, стили — в конце `src/css/custom.css`.
+- **`/links.json`** отдаётся с `Access-Control-Allow-Origin: *` и `no-cache` (`deploy/container-nginx.conf`).
+- **Кто может встраивать** — `frame-ancestors 'self' https://app.talkyhub.ru http://localhost:*`
+  (`deploy/nginx/docs.talkyhub.ru.conf`).
+- Раздел «Что нового» (`/docs/changelog/app`, позже `/docs/changelog/api`) публикует CI продуктовых репозиториев
+  в ветку `production` контент-репозитория — поэтому сборка клонирует именно `production`.
+
 ## Деплой (self-hosted, как API)
 
 Статический сайт запекается в nginx-образ и запускается контейнером за

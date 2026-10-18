@@ -342,3 +342,31 @@ body {
     background: var(--vh-bg);
   }
 }
+
+/* ---------------------------------------------------------------------------
+ * Embedded mode — the TalkyHub app shows docs pages in its help panel (an iframe, ~480px wide). Only the
+ * article: no site navbar/footer/doc sidebar/TOC, full-width content, tighter padding. Set by the inline
+ * script in docusaurus.config.ts (headTags) + src/clientModules/embed.ts.
+ * ------------------------------------------------------------------------- */
+html[data-th-embed] .navbar,
+html[data-th-embed] footer,
+html[data-th-embed] .theme-doc-sidebar-container,
+html[data-th-embed] .theme-doc-toc-desktop,
+html[data-th-embed] .theme-doc-toc-mobile,
+html[data-th-embed] .theme-doc-footer {
+  display: none !important;
+}
+html[data-th-embed] main[class*='docMainContainer'] {
+  max-width: 100% !important;
+  width: 100% !important;
+  flex-grow: 1;
+}
+html[data-th-embed] main[class*='docMainContainer'] > .container {
+  padding: 1rem 1.25rem 2rem !important;
+}
+html[data-th-embed] .theme-doc-markdown h1 {
+  font-size: 1.5rem;
+}
+html[data-th-embed] .col[class*='docItemCol'] {
+  max-width: 100% !important;
+}

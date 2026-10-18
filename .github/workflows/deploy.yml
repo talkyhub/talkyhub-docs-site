@@ -46,8 +46,10 @@ jobs:
           node-version: 20
           cache: npm
 
-      - name: Clone docs repo (public)
-        run: git clone --depth 1 https://github.com/talkyhub/talkyhub-docs.git external-docs
+      # The `production` branch is what's live: content pushes AND the app/API changelogs that their CI publishes
+      # land there (and fire docs-update). Cloning the default branch would drop anything not merged back to main.
+      - name: Clone docs repo (public, production branch)
+        run: git clone --depth 1 --branch production https://github.com/talkyhub/talkyhub-docs.git external-docs
 
       - name: Replace docs and i18n folders
         run: |
